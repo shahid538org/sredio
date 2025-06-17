@@ -1,0 +1,122 @@
+<div class="github-integration-bg">
+  <div class="github-integration-center">
+    <ng-container *ngIf="isLoading">
+      <div class="loading-container">
+        <mat-spinner diameter="48"></mat-spinner>
+      </div>
+    </ng-container>
+    <ng-container *ngIf="!isLoading && errorMsg">
+      <mat-card class="github-integration-card wide">
+        <mat-card-content>
+          <div class="error-message">
+            <mat-icon color="warn">error</mat-icon>
+            {{ errorMsg }}
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </ng-container>
+    <ng-container *ngIf="!isLoading && !errorMsg">
+      <mat-card *ngIf="isConnected" class="github-integration-card wide">
+        <mat-expansion-panel class="integration-panel outer-space" expanded>
+          <mat-expansion-panel-header>
+            <div class="panel-header-flex">
+              <div class="panel-left">
+                <img src="assets/github-mark.png" alt="GitHub Logo" class="github-logo" />
+                <span class="github-title">Github</span>
+                <mat-icon class="check-icon" color="primary" style="color: #22c55e !important;">check_circle</mat-icon>
+                <mat-icon class="clock-icon">schedule</mat-icon>
+              </div>
+              <div class="panel-right panel-right-col">
+                <div class="panel-right-row">
+                  <span class="admin-label">Admin:&nbsp;</span>
+                  <span class="last-synced">Last Synced: {{ lastSynced }}</span>
+                </div>
+                <span class="sync-type">Sync Type: {{ syncType }}</span>
+              </div>
+            </div>
+          </mat-expansion-panel-header>
+          <div class="panel-inner-content">
+            <div class="panel-actions">
+              <button mat-raised-button color="primary" class="remove-btn" (click)="removeIntegration()">
+                Remove <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </div>
+        </mat-expansion-panel>
+      </mat-card>
+      <mat-card *ngIf="!isConnected" class="github-integration-card wide">
+        <mat-card-header>
+          <mat-card-title>
+            <img src="assets/github-mark.png" alt="GitHub Logo" class="github-logo" />
+            <span class="github-title">Github</span>
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="not-connected-message">
+            <mat-icon color="warn">error</mat-icon>
+            Not connected to GitHub
+          </div>
+        </mat-card-content>
+        <mat-card-actions align="end">
+          <button mat-raised-button color="primary" (click)="connectToGitHub()">
+            <mat-icon>link</mat-icon>
+            Connect to GitHub
+          </button>
+        </mat-card-actions>
+      </mat-card>
+    </ng-container>
+  </div>
+
+  <div class="github-data-explorer-center">
+    <mat-card class="github-data-explorer-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon class="explorer-icon" color="primary">search</mat-icon>
+          GitHub Data Explorer
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="explorer-controls">
+          <mat-form-field appearance="outline" class="collection-select">
+            <mat-label>Select Collection</mat-label>
+            <mat-select [(value)]="selectedCollection" (selectionChange)="onCollectionChange()">
+              <mat-option *ngFor="let col of collections" [value]="col">{{ col }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="search-field">
+            <mat-label>Search</mat-label>
+            <input matInput [value]="searchTerm" (input)="onSearchInput($event)" placeholder="Type to search..." />
+            <button mat-icon-button matSuffix *ngIf="searchTerm" (click)="onClearSearch()">
+              <mat-icon>close</mat-icon>
+            </button>
+            <button mat-icon-button matSuffix *ngIf="!searchTerm">
+              <mat-icon>search</mat-icon>
+            </button>
+          </mat-form-field>
+        </div>
+        <div class="ag-grid-wrapper">
+          <div class="loading-container" [class.visible]="isCollectionLoading">
+            <mat-spinner diameter="40"></mat-spinner>
+          </div>
+          <ag-grid-angular
+            class="ag-theme-material"
+            [rowData]="collectionData || []"
+            [columnDefs]="columnDefs"
+            [defaultColDef]="defaultColDef"
+            [gridOptions]="gridOptions"
+            style="width: 100%; height: 400px; overflow-x: auto;">
+          </ag-grid-angular>
+          <div class="ag-pagination" *ngIf="collectionPagination && collectionPagination.pages > 1">
+            <button mat-icon-button (click)="onPageChange(currentPage - 1)" [disabled]="currentPage === 1">
+              <mat-icon>chevron_left</mat-icon>
+            </button>
+            <span>Page {{ currentPage }} of {{ collectionPagination.pages }}</span>
+            <button mat-icon-button (click)="onPageChange(currentPage + 1)" [disabled]="currentPage === collectionPagination.pages">
+              <mat-icon>chevron_right</mat-icon>
+            </button>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div> 
